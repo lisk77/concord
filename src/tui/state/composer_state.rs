@@ -394,6 +394,7 @@ impl DashboardState {
         let delta = replacement_len as isize - replaced_len as isize;
         let mut completions = Vec::with_capacity(self.composer_mention_completions.len());
 
+        #[allow(clippy::if_same_then_else)]
         for mut completion in self.composer_mention_completions.drain(..) {
             if completion.byte_end <= replaced.start {
                 completions.push(completion);
