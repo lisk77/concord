@@ -6161,3 +6161,29 @@ fn channel_entry_names(state: &DashboardState) -> Vec<&str> {
         })
         .collect()
 }
+
+#[test]
+fn hiding_focused_guild_pane_moves_focus_to_first_visible_pane() {
+    let mut state = DashboardState::new();
+    state.focus_pane(FocusPane::Guilds);
+    state.set_guild_pane_visibility(false);
+    assert_ne!(state.focus(), FocusPane::Guilds);
+    assert!(state.visible_panes().contains(&state.focus()));
+}
+
+#[test]
+fn hiding_guild_pane_while_focused_elsewhere_keeps_focus() {
+    let mut state = DashboardState::new();
+    state.focus_pane(FocusPane::Messages);
+    state.set_guild_pane_visibility(false);
+    assert_eq!(state.focus(), FocusPane::Messages);
+}
+
+#[test]
+fn cycle_focus_skips_hidden_guild_pane() {
+    let mut state = DashboardState::new();
+    state.set_guild_pane_visibility(false);
+    state.focus_pane(FocusPane::Members);
+    state.cycle_focus();
+    assert_ne!(state.focus(), FocusPane::Guilds);
+}
