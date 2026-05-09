@@ -8,8 +8,13 @@ use super::{
     types::{ActionMenuTarget, MouseTarget},
 };
 
-pub(crate) fn focus_pane_at(area: Rect, column: u16, row: u16) -> Option<FocusPane> {
-    let areas = dashboard_areas(area);
+pub(crate) fn focus_pane_at(
+    area: Rect,
+    state: &DashboardState,
+    column: u16,
+    row: u16,
+) -> Option<FocusPane> {
+    let areas = dashboard_areas(area, state);
     [
         (areas.guilds, FocusPane::Guilds),
         (areas.channels, FocusPane::Channels),
@@ -26,7 +31,7 @@ pub(crate) fn mouse_target_at(
     column: u16,
     row: u16,
 ) -> Option<MouseTarget> {
-    let areas = dashboard_areas(area);
+    let areas = dashboard_areas(area, state);
     if let Some(target) = action_menu_mouse_target(areas.messages, state, column, row) {
         return Some(target);
     }
@@ -45,8 +50,13 @@ pub(crate) fn mouse_target_at(
     None
 }
 
-pub(crate) fn user_profile_popup_contains(area: Rect, column: u16, row: u16) -> bool {
-    let areas = dashboard_areas(area);
+pub(crate) fn user_profile_popup_contains(
+    area: Rect,
+    state: &DashboardState,
+    column: u16,
+    row: u16,
+) -> bool {
+    let areas = dashboard_areas(area, state);
     rect_contains(user_profile_popup_area(areas.messages), column, row)
 }
 

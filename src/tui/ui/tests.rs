@@ -109,6 +109,7 @@ fn custom_emoji_markup_uses_id_fallback_when_disabled() {
 #[test]
 fn focus_pane_at_maps_dashboard_regions_and_ignores_non_panes() {
     let area = Rect::new(0, 0, 120, 20);
+    let state = DashboardState::new();
     let cases = [
         (1, 1, Some(FocusPane::Guilds)),
         (21, 1, Some(FocusPane::Channels)),
@@ -120,7 +121,7 @@ fn focus_pane_at_maps_dashboard_regions_and_ignores_non_panes() {
     ];
 
     for (x, y, expected) in cases {
-        assert_eq!(focus_pane_at(area, x, y), expected);
+        assert_eq!(focus_pane_at(area, &state, x, y), expected);
     }
 }
 

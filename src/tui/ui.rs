@@ -109,7 +109,7 @@ use self::{
 };
 
 pub fn sync_view_heights(area: Rect, state: &mut DashboardState) {
-    let areas = dashboard_areas(area);
+    let areas = dashboard_areas(area, state);
     state.set_guild_view_height(panel_content_height(areas.guilds, "Servers"));
     state.set_channel_view_height(panel_content_height(areas.channels, "Channels"));
     state.set_message_view_height(message_list_area(areas.messages, state).height as usize);
@@ -132,7 +132,7 @@ pub fn sync_view_heights(area: Rect, state: &mut DashboardState) {
 }
 
 pub fn image_preview_layout(area: Rect, state: &DashboardState) -> ImagePreviewLayout {
-    let areas = dashboard_areas(area);
+    let areas = dashboard_areas(area, state);
     let list = message_list_area(areas.messages, state);
     let viewer_image_area = image_viewer_image_area(areas.messages);
     ImagePreviewLayout {
@@ -153,7 +153,7 @@ pub fn render(
     emoji_images: Vec<EmojiReactionImage<'_>>,
     profile_avatar: Option<AvatarImage>,
 ) {
-    let areas = dashboard_areas(frame.area());
+    let areas = dashboard_areas(frame.area(), state);
     let mut inline_image_previews = Vec::new();
     let mut viewer_image_preview = None;
     for image_preview in image_previews {

@@ -11,7 +11,19 @@ use super::types::{
     MESSAGE_AVATAR_OFFSET, MIN_MESSAGE_INPUT_HEIGHT, MessageAreas,
 };
 
-pub(super) fn dashboard_areas(area: Rect) -> DashboardAreas {
+pub(super) fn dashboard_areas(area: Rect, state: &DashboardState) -> DashboardAreas {
+    let guild_width = if state.is_guild_pane_visible() { 20 } else { 0 };
+    let channel_width = if state.is_channel_pane_visible() {
+        24
+    } else {
+        0
+    };
+    let member_width = if state.is_member_pane_visible() {
+        26
+    } else {
+        0
+    };
+
     let [header, main, footer] = Layout::vertical([
         Constraint::Length(1),
         Constraint::Min(0),
@@ -20,10 +32,10 @@ pub(super) fn dashboard_areas(area: Rect) -> DashboardAreas {
     .areas(area);
 
     let [guilds, channels, center, members] = Layout::horizontal([
-        Constraint::Length(20),
-        Constraint::Length(24),
+        Constraint::Length(guild_width),
+        Constraint::Length(channel_width),
         Constraint::Min(40),
-        Constraint::Length(26),
+        Constraint::Length(member_width),
     ])
     .areas(main);
 

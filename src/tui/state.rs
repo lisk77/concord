@@ -214,6 +214,9 @@ pub struct DashboardState {
     collapsed_folders: HashSet<FolderKey>,
     collapsed_channel_categories: HashSet<Id<ChannelMarker>>,
     pending_commands: VecDeque<AppCommand>,
+    guild_pane_visible: bool,
+    channel_pane_visible: bool,
+    member_pane_visible: bool,
 }
 
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
@@ -328,6 +331,9 @@ impl DashboardState {
             collapsed_folders: HashSet::new(),
             collapsed_channel_categories: HashSet::new(),
             pending_commands: VecDeque::new(),
+            guild_pane_visible: true,
+            channel_pane_visible: true,
+            member_pane_visible: true,
         }
     }
 
@@ -679,6 +685,33 @@ impl DashboardState {
 
     pub fn is_guild_action_menu_open(&self) -> bool {
         self.guild_action_menu.is_some()
+    }
+
+    pub fn is_guild_pane_visible(&self) -> bool {
+        self.guild_pane_visible
+    }
+
+    pub fn set_guild_pane_visibility(&mut self, visible: bool) {
+        self.guild_pane_visible = visible;
+        self.update_focus();
+    }
+
+    pub fn is_channel_pane_visible(&self) -> bool {
+        self.channel_pane_visible
+    }
+
+    pub fn set_channel_pane_visibility(&mut self, visible: bool) {
+        self.channel_pane_visible = visible;
+        self.update_focus();
+    }
+
+    pub fn is_member_pane_visible(&self) -> bool {
+        self.member_pane_visible
+    }
+
+    pub fn set_member_pane_visibility(&mut self, visible: bool) {
+        self.member_pane_visible = visible;
+        self.update_focus();
     }
 
     pub fn open_actions_for_focused_target(&mut self) {
@@ -1857,22 +1890,42 @@ impl DashboardState {
         }
     }
 
+    fn visible_panes(&self) -> Vec<FocusPane> {
+        let mut panes = Vec::new();
+
+        if self.guild_pane_visible {
+            panes.push(FocusPane::Guilds);
+        }
+        if self.channel_pane_visible {
+            panes.push(FocusPane::Channels);
+        }
+
+        panes.push(FocusPane::Messages);
+
+        if self.member_pane_visible {
+            panes.push(FocusPane::Members);
+        }
+
+        panes
+    }
+
+    fn update_focus(&mut self) {
+        let panes = self.visible_panes();
+        if !panes.contains(&self.focus) {
+            self.focus = panes[0];
+        }
+    }
+
     pub fn cycle_focus(&mut self) {
-        self.focus = match self.focus {
-            FocusPane::Guilds => FocusPane::Channels,
-            FocusPane::Channels => FocusPane::Messages,
-            FocusPane::Messages => FocusPane::Members,
-            FocusPane::Members => FocusPane::Guilds,
-        };
+        let panes = self.visible_panes();
+        let idx = panes.iter().position(|&p| p == self.focus).unwrap_or(0);
+        self.focus = panes[(idx + 1) % panes.len()];
     }
 
     pub fn cycle_focus_backward(&mut self) {
-        self.focus = match self.focus {
-            FocusPane::Guilds => FocusPane::Members,
-            FocusPane::Channels => FocusPane::Guilds,
-            FocusPane::Messages => FocusPane::Channels,
-            FocusPane::Members => FocusPane::Messages,
-        };
+        let panes = self.visible_panes();
+        let idx = panes.iter().position(|&p| p == self.focus).unwrap_or(0);
+        self.focus = panes[(idx + panes.len() - 1) % panes.len()];
     }
 
     pub fn focus_pane(&mut self, pane: FocusPane) {

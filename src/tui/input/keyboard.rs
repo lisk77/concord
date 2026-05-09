@@ -78,10 +78,26 @@ pub fn handle_key(state: &mut DashboardState, key: KeyEvent) -> Option<AppComman
         KeyCode::Char('o') => state.open_options_popup(),
         KeyCode::Char('a') => state.open_actions_for_focused_target(),
         KeyCode::Char('i') => state.start_composer(),
-        KeyCode::Char('1') => state.focus_pane(FocusPane::Guilds),
-        KeyCode::Char('2') => state.focus_pane(FocusPane::Channels),
+        KeyCode::Char('1') if !key.modifiers.contains(KeyModifiers::ALT) => {
+            state.focus_pane(FocusPane::Guilds)
+        }
+        KeyCode::Char('1') if key.modifiers.contains(KeyModifiers::ALT) => {
+            state.set_guild_pane_visibility(!state.is_guild_pane_visible())
+        }
+        KeyCode::Char('2') if !key.modifiers.contains(KeyModifiers::ALT) => {
+            state.focus_pane(FocusPane::Channels)
+        }
+        KeyCode::Char('2') if key.modifiers.contains(KeyModifiers::ALT) => {
+            state.set_channel_pane_visibility(!state.is_channel_pane_visible())
+        }
         KeyCode::Char('3') => state.focus_pane(FocusPane::Messages),
-        KeyCode::Char('4') => state.focus_pane(FocusPane::Members),
+        KeyCode::Char('4') if !key.modifiers.contains(KeyModifiers::ALT) => {
+            state.focus_pane(FocusPane::Members)
+        }
+        KeyCode::Char('4') if key.modifiers.contains(KeyModifiers::ALT) => {
+            state.set_member_pane_visibility(!state.is_member_pane_visible())
+        }
+
         KeyCode::Char('j') | KeyCode::Down => state.move_down(),
         KeyCode::Char('J') if focus == FocusPane::Messages => state.scroll_message_viewport_down(),
         KeyCode::Char('L') => state.scroll_focused_pane_horizontal_right(),
